@@ -87,7 +87,7 @@ function gltfReader(gltf) {
   }
 }
 
-loadData();
+//loadData();
 
 
 camera.position.z = 3;
