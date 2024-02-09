@@ -36,7 +36,7 @@ import {
 } from 'three/addons/loaders/GLTFLoader.js';
 import * as dat from 'dat.gui';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-//import { ZZFX, zzfx } from './ZzFX.js';
+import { ZZFX, zzfx } from './node_modules/zzfx/ZzFX.js';
 const loader = new TextureLoader();
 const skyboxTexture = loader.load('assets/textures/skybox.jpg');
 const grassTexture = loader.load('assets/textures/grass.jpg');
@@ -68,6 +68,7 @@ let selectedEntity = 0;
 const blécounter = document.getElementById('score');
 const icon1Button = document.getElementById('icon1');
 const icon2Button = document.getElementById('icon2');
+const icon3Button = document.getElementById('icon3');
 // {
 //     const color = 0xffffff;
 //     const intensity = 1.5;
@@ -136,6 +137,10 @@ icon2Button.addEventListener('click', () => {
     console.log('Icon 2 clicked');
     selectedEntity = 2;
 });
+icon3Button.addEventListener('click', () => {
+    console.log('Icon 3 clicked');
+    selectedEntity = 3;
+});
 
 function updateblé(float) {
     blé += float;
@@ -162,9 +167,16 @@ window.addEventListener('click', (event) => {
             }
             break;
         case 2:
-            if (blé >= 20) {
+            if (blé >= 25) {
                 spawnPig();
                 updateblé(-20);
+            }
+            break;
+        case 3:
+            if (blé >= 100) {
+                square.getWorldPosition(tmp);
+                spawnChicken(tmp);
+                updateblé(-100);
             }
             break;
         default:
@@ -253,11 +265,12 @@ function spawnPig() {
     animaux.push(pig);
 }
 class Chicken {
-    constructor() {
+    constructor(position) {
         this.mesh = new Mesh();
         modelLoader.load('assets/models/chicken.glb', (gltf) => {
             this.mesh = gltf.scene;
-            this.mesh.position.set(40, 2, 15);
+            //this.mesh.position.set(40, 2, 15);
+            this.mesh.position.copy(position);
             this.mesh.scale.set(0.6, 0.6, 0.6);
             this.mesh.rotation.y = Math.PI;
             scene.add(this.mesh);
@@ -270,7 +283,6 @@ class Chicken {
         this.dist = 0;
         this.hitpoints = 1;
         this.shootTimer = 0;
-        scene.add(this.mesh);
     }
 
     tick(deltaTime) {
@@ -284,9 +296,9 @@ class Chicken {
 
 }
 
-function spawnChicken() {
-    const chicken = new Chicken();
-    chicken.mesh.position.set(40, 2, 20);
+function spawnChicken(position) {
+    const chicken = new Chicken(position);
+    //chicken.mesh.position.set(40, 2, 20);
     animaux.push(chicken);
 }
 
@@ -360,7 +372,7 @@ function spawnEnemy() {
     enemy.mesh.position.set(-80, 2, 20);
     enemies.push(enemy);
 }
-spawnChicken();
+spawnChicken(new Vector3(40, 2, -30));
 spawnFarmer(new Vector3(40, 2, 5));
 spawnPig();
 /*
@@ -378,7 +390,8 @@ const eggMaterial = new MeshToonMaterial({ color: 0xbd9366 });
 //scene.add(eggMesh);
 
 function shootEgg(position) {
-    modelLoader.load('assets/models/egg2.glb', (gltf) => {
+    zzfx(...[,,262,,,.03,4,.27,-46.1,.1,,,.02,.4,1,,,.7,.04]); // Random 42 - Mutation 9
+        modelLoader.load('assets/models/egg2.glb', (gltf) => {
         const eggModel = gltf.scene;
         eggModel.position.copy(position);
         eggModel.rotation.z = Math.random() * Math.PI * 2;
