@@ -17,6 +17,8 @@
     "vite-plugin-static-copy": "^0.13.0"
   },
   "dependencies": {
-    "three": "^0.149.0"
+    "dat.gui": "^0.7.9",
+    "three": "^0.149.0",
+    "zzfx": "^1.2.1"
   }
 }

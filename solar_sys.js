@@ -37,12 +37,13 @@ camera.lookAt(0, 0, 0);
 const loader = new TextureLoader();
 const sunTex = loader.load('assets/textures/2k_sun.jpg');
 
-{
+/*{
     const color = 0xFFFFFF;
     const intensity = 3;
     const light = new PointLight(color, intensity);
     scene.add(light);
-}
+}*/
+
 
 //const light = new AmbientLight(0xffffff, 1.0); // soft white light
 //scene.add(light);
