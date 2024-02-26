@@ -26,17 +26,17 @@ import {
     LoopOnce,
     Raycaster,
     Vector3
-} from './node_modules/three';
+} from 'three';
 //import { GUI } from './node_modules/three/addons/libs/lil-gui.module.min.js';
 // import {
 //     OrbitControls
 // } from 'three/addons/controls/OrbitControls.js';
 import {
     GLTFLoader
-} from './node_modules/three/examples/jsm/loaders/GLTFLoader.js';
+} from 'three/addons/loaders/GLTFLoader.js';
 // import * as dat from 'dat.gui';
 // import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { ZZFX, zzfx } from './node_modules/zzfx/ZzFX.js';
+import { ZZFX, zzfx } from 'zzfx';
 const loader = new TextureLoader();
 const skyboxTexture = loader.load('assets/textures/skybox.jpg');
 const grassTexture = loader.load('assets/textures/grass.jpg');
