@@ -19,7 +19,7 @@
   "dependencies": {
     "dat.gui": "^0.7.9",
     "ng-zzfx": "^0.0.6",
-    "node": "^21.6.1",
+    "node": "latest",
     "three": "^0.149.0",
     "zzfx": "^1.2.1"
   }
