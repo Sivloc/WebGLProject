@@ -37,3 +37,7 @@ body {
   width: 50px;
   height: 50px;
 }
+
+.icon-clicked {
+  border: 2px solid red;
+}

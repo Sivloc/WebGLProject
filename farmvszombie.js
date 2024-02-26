@@ -130,16 +130,26 @@ scene.add(grangeMesh);
 
 
 icon1Button.addEventListener('click', () => {
+
     console.log('Icon 1 clicked');
     selectedEntity = 1;
+    icon2Button.classList.remove('icon-clicked');
+    icon3Button.classList.remove('icon-clicked');
+    icon1Button.classList.add('icon-clicked');
 });
 icon2Button.addEventListener('click', () => {
     console.log('Icon 2 clicked');
     selectedEntity = 2;
+    icon1Button.classList.remove('icon-clicked');
+    icon3Button.classList.remove('icon-clicked');
+    icon2Button.classList.add('icon-clicked');
 });
 icon3Button.addEventListener('click', () => {
     console.log('Icon 3 clicked');
     selectedEntity = 3;
+    icon1Button.classList.remove('icon-clicked');
+    icon2Button.classList.remove('icon-clicked');
+    icon3Button.classList.add('icon-clicked');
 });
 
 function updateblé(float) {
@@ -168,7 +178,8 @@ window.addEventListener('click', (event) => {
             break;
         case 2:
             if (blé >= 25) {
-                spawnPig();
+                square.getWorldPosition(tmp);
+                spawnPig(tmp);
                 updateblé(-20);
             }
             break;
@@ -202,6 +213,8 @@ class Farmer {
             this.gltf = gltf;
             this.mixer = new AnimationMixer(this.mesh);
             this.action = this.mixer.clipAction(gltf.animations[23]);
+            this.action.setLoop(LoopOnce);
+            //this.action.clampWhenFinished = true;
             console.log(this.gltf.animations);
         })
         this.mesh.castShadow = true;
@@ -216,7 +229,6 @@ class Farmer {
             if (this.gltf && this.action) {
                 this.action.play();
                 updateblé(50);
-                //zzfx(...[, , 540, .01, .05, .15, 1, .23, , -1.5, 51, .08, , , , , , .63, .03, .05]); // Pickup 3
             }
         }
         if (this.hitpoints <= 0) {
@@ -235,14 +247,14 @@ function spawnFarmer(position) {
 }
 
 class Pig {
-    constructor() {
+    constructor(position) {
         this.mesh = new Mesh();
         // var geom = new SphereGeometry(5, 30, 30);
         // var mat = new MeshPhongMaterial({ color: 0xff0000, shininess: 0, specular: 0xffffff, flatShading: true })
         // this.mesh = new Mesh(geom, mat);
         modelLoader.load('assets/models/Pig.glb', (gltf) => {
             this.mesh = gltf.scene;
-            this.mesh.position.set(40, 2, -8);
+            this.mesh.position.copy(position);
             this.mesh.scale.set(2, 2, 1.5);
             this.mesh.rotation.y = Math.PI;
             scene.add(this.mesh);
@@ -259,9 +271,9 @@ class Pig {
     }
 
 }
-function spawnPig() {
-    const pig = new Pig();
-    pig.mesh.position.set(40, 2, -5);
+function spawnPig(position) {
+    const pig = new Pig(position);
+    //pig.mesh.position.set(40, 2, -5);
     animaux.push(pig);
 }
 class Chicken {
@@ -308,6 +320,8 @@ class Enemy {
         this.mixer = new AnimationMixer(this.mesh);
         this.gltf = null;
         this.action = null;
+        this.ismoving = true;
+        this.cooldown = 0;
         modelLoader.load('assets/models/Fox.glb', (gltf) => {
             this.mesh = gltf.scene;
             //this.mesh.position.set(-80, 0, 20);
@@ -350,7 +364,9 @@ class Enemy {
 
     tick(deltaTime) {
         this.mixer.update(deltaTime);
-        this.mesh.position.x += 0.4;
+        if (this.ismoving) {
+            this.mesh.position.x += 0.4;
+        }
 
         for (const projectile of projectiles) {
             if (collide(projectile, this.mesh, 10)) {
@@ -360,6 +376,24 @@ class Enemy {
             }
 
         }
+
+        for (const animal of animaux) {
+            if (this.cooldown <= 0) {
+                if (collide(animal.mesh, this.mesh, 10)) {
+                    this.mixer.clipAction(this.gltf.animations[0]).play();
+                    zzfx(...[2.32, , 356, .03, .03, .07, 1, 1.16, , 6.8, , , .04, 1.1, 2, .3, .11, .61, .05, .1]); // Hit 159
+                    animal.hitpoints -= 1;
+                    this.ismoving = false;
+                    this.cooldown = 100;
+                    console.log(this.cooldown)
+                } else {
+                    this.ismoving = true;
+                }
+            } else {
+                this.cooldown -= 1;
+            }
+        }
+        //this.cooldown -= 1;
         if (this.hitpoints <= 0) {
             this.mixer.clipAction(this.gltf.animations[1]).play();
             scene.remove(this.mesh);
@@ -390,8 +424,8 @@ const eggMaterial = new MeshToonMaterial({ color: 0xbd9366 });
 //scene.add(eggMesh);
 
 function shootEgg(position) {
-    zzfx(...[,,262,,,.03,4,.27,-46.1,.1,,,.02,.4,1,,,.7,.04]); // Random 42 - Mutation 9
-        modelLoader.load('assets/models/egg2.glb', (gltf) => {
+    zzfx(...[, , 262, , , .03, 4, .27, -46.1, .1, , , .02, .4, 1, , , .7, .04]); // Random 42 - Mutation 9
+    modelLoader.load('assets/models/egg2.glb', (gltf) => {
         const eggModel = gltf.scene;
         eggModel.position.copy(position);
         eggModel.rotation.z = Math.random() * Math.PI * 2;
@@ -418,7 +452,7 @@ const animation = () => {
     renderer.setAnimationLoop(animation); // requestAnimationFrame() replacement, compatible with XR 
 
     const delta = clock.getDelta();
-    console.log(delta);
+    //console.log(delta);
     const elapsed = clock.getElapsedTime();
     if (elapsed % 3 < 0.02) {
         spawnEnemy();
